@@ -1,14 +1,4 @@
 Config.Release.board.BOARD.ID=uno
-Config.Release.board.BOARD.MENU.cpu=getMenuItemIDFromMenuItemName did not find menu item with name "ATmega328P" for menu ID "cpu" and for boardID "uno"!
-Config.Release.board.BOARD.MENU.dbg=getMenuItemIDFromMenuItemName did not find menu item with name "None" for menu ID "dbg" and for boardID "GenC0"!
-Config.Release.board.BOARD.MENU.keys=getMenuItemIDFromMenuItemName did not find menu item with name "German (Mac)" for menu ID "keys" and for boardID "teensy36"!
-Config.Release.board.BOARD.MENU.opt=getMenuItemIDFromMenuItemName did not find menu item with name "Faster (-O2) with LTO" for menu ID "opt" and for boardID "GenC0"!
-Config.Release.board.BOARD.MENU.pnum=getMenuItemIDFromMenuItemName did not find menu item with name "Generic C011F6Ux" for menu ID "pnum" and for boardID "GenC0"!
-Config.Release.board.BOARD.MENU.rtlib=getMenuItemIDFromMenuItemName did not find menu item with name "Newlib Nano + Float Printf" for menu ID "rtlib" and for boardID "GenC0"!
-Config.Release.board.BOARD.MENU.speed=getMenuItemIDFromMenuItemName did not find menu item with name "2 MHz (No USB)" for menu ID "speed" and for boardID "teensy36"!
-Config.Release.board.BOARD.MENU.upload_method=getMenuItemIDFromMenuItemName did not find menu item with name "STM32CubeProgrammer (Serial)" for menu ID "upload_method" and for boardID "GenC0"!
-Config.Release.board.BOARD.MENU.usb=getMenuItemIDFromMenuItemName did not find menu item with name "Keyboard + Mouse + Touch Screen" for menu ID "usb" and for boardID "teensy36"!
-Config.Release.board.BOARD.MENU.xserial=getMenuItemIDFromMenuItemName did not find menu item with name "Disabled (no Serial support)" for menu ID "xserial" and for boardID "GenC0"!
 Config.Release.board.BOARD.TXT=C:\sloeber\V4.4.3\arduinoPlugin\packages\arduino\hardware\avr\1.8.6\boards.txt
 Config.Release.board.PROGRAMMER.NAME=
 Config.Release.board.UPLOAD.PORT=COM5
