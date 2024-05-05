@@ -21,6 +21,7 @@ private:
 	boolean myIsRunningRequested;
 	boolean myIsPauzedRequested;
 	boolean myIsPauzedStopRequested;
+	boolean myIsInstartup=true;//Is in startup to deal will millis overflow
 
 public:
 	WasMachine(uint8_t pin, uint32_t startDelay, uint32_t onTime,

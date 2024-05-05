@@ -46,8 +46,6 @@ void WasMachine::setup() {
 }
 
 void WasMachine::loop() {
-	uint8_t calcState = expectedPinState();
-
 	if (myIsRunningRequested && !myIsRunning) {
 		//request to start running
 		myIsRunning = true;
@@ -56,52 +54,34 @@ void WasMachine::loop() {
 	if (myIsPauzedRequested && !myIsPauzed) {
 		//request to pauze
 		myIsPauzed = true;
-		setMotor( LOW);
 	}
 	if (myIsPauzedStopRequested && myIsPauzed) {
 		//request to end pauze
 		myIsPauzed = false;
-		setMotor(calcState);
 	}
 	myIsRunningRequested = false;
 	myIsPauzedRequested = false;
 	myIsPauzedStopRequested = false;
 
-	if (myIsPauzed) {
-		return;
-	}
-		setMotor(calcState);
+	setMotor(expectedPinState());
 
 }
 
 uint8_t WasMachine::expectedPinState() {
+	if (myIsPauzed) {
+		return LOW;
+	}
 
+	uint32_t correctedMillis = loopMillis - myActualStartTime
+			- myRequiredStartDelay;
+	uint32_t cycleTime = myRequiredOnTime + myRequiredRestartDelay;
 
-	uint32_t correctedMillis= loopMillis - myActualStartTime - myRequiredStartDelay;
-	uint32_t cycleTime= myRequiredOnTime + myRequiredRestartDelay;
-
-//	static uint32_t lastPlot;
-//	if(loopMillis-lastPlot>=1000){
-//		lastPlot=loopMillis;
-//		plot3(Serial,correctedMillis,myRequiredOnTime,
-//				correctedMillis% cycleTime);
-//		Serial.print(correctedMillis);
-//		Serial.print("  ");
-//		Serial.print(myRequiredOnTime);
-//		Serial.print("  ");
-//		Serial.print(myRequiredRestartDelay);
-//		Serial.print("  ");
-//		Serial.print(cycleTime);
-//				Serial.print("  ");
-//		Serial.println(	correctedMillis% cycleTime);
-//	}
-
-
-	if (loopMillis < myActualStartTime + myRequiredStartDelay) {
+	if (myIsInstartup && (loopMillis - myActualStartTime < myRequiredStartDelay)) {
 		//waiting for first start
 		return LOW;
 	}
-	if ((correctedMillis% cycleTime) < myRequiredOnTime) {
+	myIsInstartup=false;
+	if ((correctedMillis % cycleTime) < myRequiredOnTime) {
 		return HIGH;
 	}
 	return LOW;
