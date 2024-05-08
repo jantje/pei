@@ -1,10 +1,11 @@
 #include "pei_slingers.h"
 
-#define MOTOR_STEPS 20
+#define MOTOR_STEPS 200
 #define DIR_PIN 12
 #define STEP_PIN 11
 #define ENABLE_PIN 13
-#define SWITCH_PIN 10
+#define SWITCH_PIN A0
+#define SWITCH_GND A1
 Stapper myStapper = Stapper( STEP_PIN, DIR_PIN, ENABLE_PIN, MOTOR_STEPS);
 Brains brains=Brains();
 uint32_t loopMillis=0;
@@ -17,6 +18,8 @@ void setup() {
 	delay(2000);
     Serial.begin(9600);
     Serial.println("starting pei_slingers");
+	pinMode(SWITCH_GND, OUTPUT);
+	digitalWrite(SWITCH_GND, LOW);
     myStapper.setup();
     Serial.println("pei_slingers started");
     brains.setup();
@@ -29,9 +32,9 @@ void loop() {
 	brains.loop();
 	myStapper.loop();
 	mySwitch.loop();
-	if(loopMillis-lastPlot>10){
+	if(loopMillis-lastPlot>1000){
 		lastPlot=loopMillis;
-	plot3(Serial,brains.getState(),myStapper.getDirection()*150,myStapper.hasStepped()?100:0);
+		plot3(Serial,brains.getState(),myStapper.getDirection()*150,myStapper.getNumSteps());
 	}
 
 }

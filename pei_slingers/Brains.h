@@ -12,6 +12,7 @@ class Brains {
 	private:
 	uint8_t myState=0;
 	uint32_t myLastStateChange=0;
+	boolean myIsWitchClosed=false;
 public:
 	Brains();
 	virtual ~Brains();

@@ -27,6 +27,7 @@ private :
 	uint32_t myNextStepDuration=0;  //time till the step pin needs to be set high
 	uint32_t myLastStepTime=0;
 	int16_t myDirection=0;
+	int16_t myNumSteps=0;
 	boolean myHasStepped=false;
 private :
 	void calculateNextStepParams();
@@ -37,6 +38,6 @@ public:
 	void loop();
 	void setSpeed(uint16_t roundsPerMinute,uint32_t accelerationDuration);
 	int16_t getDirection(){return myDirection;};
-	boolean  hasStepped();
+	int16_t getNumSteps();
 };
 
