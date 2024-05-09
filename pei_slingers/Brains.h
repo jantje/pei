@@ -7,10 +7,13 @@
 
 #pragma once
 #include "Arduino.h"
+#define TOTAL_STATES 4
+#define EEPROM_WRITE_LOCATION 0
 
 class Brains {
 	private:
-	uint8_t myState=0;
+	uint8_t myState=TOTAL_STATES+1;
+	uint8_t myNewState=0;
 	uint32_t myLastStateChange=0;
 	boolean myIsWitchClosed=false;
 public:

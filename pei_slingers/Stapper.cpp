@@ -23,45 +23,96 @@ void Stapper::setup() {
 	pinMode(myStepPin, OUTPUT);
 	pinMode(myDirectionPin, OUTPUT);
 	pinMode(myEnablePin, OUTPUT);
-	digitalWrite(myDirectionPin, LOW);
-	digitalWrite(myEnablePin, HIGH);
+	digitalWrite(myDirectionPin, HIGH);
+	digitalWrite(myEnablePin, LOW);
 }
+
+#define HIGH_ON
+#ifdef HIGH_ON
+#define MY_ON HIGH
+#define MY_OFF LOW
+#else
+#define MY_ON LOW
+#define MY_OFF HIGH
+#endif
 
 void Stapper::loop() {
 
 	if (myNewLastSetSpeed != myLastSetSpeed) {
 		//we got new speed so we need to do some stuff here
+		myOldRoundsPerMinute = myRoundsPerMinute;
 		myRoundsPerMinute = myNewRoundsPerMinute;
 		myAccelerationDuration = myNewAccelerationDuration;
+
+		myMaxRoundsPerMinute = myNewMaxRoundsPerMinute;
+		mySinusDuration = myNewSinusDuration;
+		mySpeedType = myNewSpeedType;
+
 		myLastSetSpeed = myNewLastSetSpeed;
 	}
-	if (loopMillis - myLastStepTime > myNextStepDuration) {
-		if (myHasStepped) {
-			if (loopMillis - myLastStepTime > 1) {
-				digitalWrite(myStepPin, LOW);
-				myNumSteps++;
-				myHasStepped = false;
-			}
-		} else {
-			myLastStepTime = loopMillis;
-			calculateNextStepParams();
-			digitalWrite(myStepPin, HIGH);
-			myHasStepped = true;
+	if ((myActualRoundsPerMinute == 0)
+			|| (loopMicros - myLastStepTime >= myNextStepDuration)) {
+
+		myLastStepTime = loopMicros;
+		calculateNextStepParams();
+		if (myNewDirection != myDirection) {
+			myDirection = myNewDirection;
+			digitalWrite(myDirectionPin, myDirection);
 		}
+		digitalWrite(myStepPin, LOW);
+		delayMicroseconds(10);
+		digitalWrite(myStepPin, HIGH);
+
+		myNumSteps++;
 	}
+}
+
+uint32_t map_uint32_t(uint32_t x, uint32_t in_min, uint32_t in_max,
+		uint32_t out_min, uint32_t out_max) {
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 void Stapper::calculateNextStepParams() {
-	uint32_t stepsPerMinute = myRoundsPerMinute * myStepsPerRound;
-	myNextStepDuration = 60000UL / stepsPerMinute;
+	myActualRoundsPerMinute = myRoundsPerMinute;
+	if (mySpeedType == CONSTANT) {
+		if (loopMillis - myLastSetSpeed < myAccelerationDuration) {
+			uint32_t time = loopMillis - myLastSetSpeed;
+			if (myOldRoundsPerMinute == 0) {
+				myOldRoundsPerMinute++;
+			}
+			myActualRoundsPerMinute = map(time, 0, myAccelerationDuration,
+					myOldRoundsPerMinute, myRoundsPerMinute);
+		}
+	} else {
+		uint32_t time = loopMillis - myLastSetSpeed;
+		float angle = (((float) time) * 3.14) / mySinusDuration;
+		float sinus = sin(angle);
+		myActualRoundsPerMinute = abs(sinus) * myRoundsPerMinute;
+		sinus < 0 ? myNewDirection = LOW : myNewDirection = HIGH;
+	}
+//		Serial.print(time);
+//		Serial.print(";");
+//		Serial.print(myAccelerationDuration);
+//		Serial.print(";");
+//		Serial.print(myOldRoundsPerMinute);
+////		Serial.print(";");
+//		Serial.print(myRoundsPerMinute);
+//		Serial.print(";");
+//		Serial.println(myActualRoundsPerMinute);
+	//usedRoundsPerMinute=usedRoundsPerMinute*(loopMillis-myLastSetSpeed/myAccelerationDuration);
+	uint32_t stepsPerMinute = myActualRoundsPerMinute
+			* (uint32_t) myStepsPerRound;
+	myNextStepDuration = 60000000UL / stepsPerMinute;
 	myDirection = 1;
-}
 
-void Stapper::setSpeed(uint16_t roundsPerMinute,
-		uint32_t accelerationDuration) {
-	myNewRoundsPerMinute = roundsPerMinute;
-	myNewAccelerationDuration = accelerationDuration;
-	myNewLastSetSpeed = loopMillis;
+//			Serial.print(stepsPerMinute);
+//			Serial.print(";");
+//			Serial.print(myNextStepDuration);
+//			Serial.print(";");
+//			Serial.print(myRoundsPerMinute);
+//			Serial.print(";");
+//			Serial.println(myActualRoundsPerMinute);
+
 }
 
 int16_t Stapper::getNumSteps() {
@@ -69,4 +120,22 @@ int16_t Stapper::getNumSteps() {
 	myNumSteps = 0;
 	return ret;
 
+}
+
+void Stapper::setSpeed(uint16_t roundsPerMinute,
+		uint32_t accelerationDuration) {
+	myNewRoundsPerMinute = roundsPerMinute;
+	myNewAccelerationDuration = accelerationDuration;
+	myNewSpeedType = CONSTANT;
+	myNewLastSetSpeed = loopMillis;
+
+}
+
+void Stapper::setSinusSpeed(uint16_t maxRoundsPerMinute,
+		uint32_t accelerationDuration, uint32_t sinusDuration) {
+	myNewMaxRoundsPerMinute = maxRoundsPerMinute;
+	myNewAccelerationDuration = accelerationDuration;
+	myNewSinusDuration = sinusDuration;
+	myNewSpeedType = SINUS;
+	myNewLastSetSpeed = loopMillis;
 }

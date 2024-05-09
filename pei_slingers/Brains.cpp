@@ -7,6 +7,7 @@
 
 #include "pei_slingers.h"
 
+
 Brains::Brains() {
 	// TODO Auto-generated constructor stub
 
@@ -17,61 +18,74 @@ Brains::~Brains() {
 }
 
 void Brains::setup() {
-
+	uint8_t mem =EEPROM.get(EEPROM_WRITE_LOCATION, mem);
+	if(mem > TOTAL_STATES){
+		mem=0;
+	}
+	myNewState=mem;
 }
 
 void Brains::loop() {
-	boolean changeState=myState == 0;
-	if(mySwitch.isClosed()){
-		if(!myIsWitchClosed){
-			changeState=true;
-			myIsWitchClosed=true;
-		}
+	if (loopMillis - myLastStateChange > 1000) {
+		//only change state once a second at most
+		if (mySwitch.isClosed()) {
+			if (!myIsWitchClosed) {
+				myNewState=myState+1;
+				if(myNewState>TOTAL_STATES){
+					myNewState=1;
+				}
+				myIsWitchClosed = true;
+			}
 
-	}else{
-		myIsWitchClosed=false;
+		} else {
+			myIsWitchClosed = false;
+		}
 	}
 
-	if (changeState) {
+	if (myNewState!=myState) {
+		myLastStateChange = loopMillis;
+
 		Serial.print("changing from state ");
 		Serial.print(myState);
-		myLastStateChange = loopMillis;
+		Serial.print(" to state ");
+		Serial.println(myNewState);
+		myState=myNewState;
+		EEPROM.put(EEPROM_WRITE_LOCATION, myState);
+
+
 		switch (myState) {
-		case 0:
+		case 1:
 			changeToState1();
 			break;
-		case 1:
+		case 2:
 			changeToState2();
 			break;
-		case 2:
+		case 3:
 			changeToState3();
 			break;
-		case 3:
+		case 4:
 			changeToState4();
 			break;
-		case 4:
+		default:
+			myState=1;
+			myNewState=1;
 			changeToState1();
 			break;
 		}
-		Serial.print(" to state ");
-		Serial.println(myState);
+
 	}
 }
 
 void Brains::changeToState1() {
-	myState = 1;
-	myStapper.setSpeed(10, 500);
+	myStapper.setSpeed(10, 20000);
 }
 void Brains::changeToState2() {
-	myState = 2;
-	myStapper.setSpeed(20, 500);
+	myStapper.setSpeed(20, 20000);
 }
 void Brains::changeToState3() {
-	myState = 3;
-	myStapper.setSpeed(30, 500);
+	myStapper.setSinusSpeed(45, 20000,10 MINUTES);
 }
 void Brains::changeToState4() {
-	myState = 4;
-	myStapper.setSpeed(40, 500);
+	myStapper.setSinusSpeed(45, 20000,20 MINUTES);
 }
 
