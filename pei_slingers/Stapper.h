@@ -28,7 +28,7 @@ private :
 	uint32_t myLastSetSpeed=0;
 	uint32_t myLastAccelerationDuration=0;
 	uint32_t myNextStepDuration=0;  //time till the step pin needs to be set high
-	uint32_t myActualRoundsPerMinute=0; //The speed the stepper is actually running
+	float myActualRoundsPerMinute=0; //The speed the stepper is actually running
 	uint32_t myLastStepTime=0;
 	int16_t myDirection=0;
 	int16_t myNewDirection=0;
@@ -58,5 +58,6 @@ public:
 
 	int16_t getDirection(){return myDirection;};
 	int16_t getNumSteps();
+	float getActualRoundsPerMinute(){return myActualRoundsPerMinute;};
 };
 

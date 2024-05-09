@@ -36,7 +36,19 @@ void loop() {
 	mySwitch.loop();
 	if(loopMillis-lastPlot>1000){
 		lastPlot=loopMillis;
-		plot3(Serial,brains.getState()*10,myStapper.getDirection()*100,myStapper.getNumSteps());
+		int16_t state=brains.getState()*100;
+		int16_t direction=myStapper.getDirection()*150;
+		int16_t steps=myStapper.getNumSteps();
+		int16_t roundsPer100Minutes=myStapper.getActualRoundsPerMinute()*100;
+
+		plot4(Serial,state,direction,steps,roundsPer100Minutes);
+		Serial.print(state);
+		Serial.print(";");
+		Serial.print(direction);
+		Serial.print(";");
+		Serial.print(steps);
+		Serial.print(";");
+		Serial.println(roundsPer100Minutes);
 	}
 
 }

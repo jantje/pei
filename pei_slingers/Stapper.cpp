@@ -50,20 +50,20 @@ void Stapper::loop() {
 
 		myLastSetSpeed = myNewLastSetSpeed;
 	}
-	if ((myActualRoundsPerMinute == 0)
-			|| (loopMicros - myLastStepTime >= myNextStepDuration)) {
 
+		if((loopMicros - myLastStepTime >= myNextStepDuration)) {
+			if (myActualRoundsPerMinute != 0){
+				if (myNewDirection != myDirection) {
+					myDirection = myNewDirection;
+					digitalWrite(myDirectionPin, myDirection);
+				}
+				digitalWrite(myStepPin, LOW);
+				delayMicroseconds(10);
+				digitalWrite(myStepPin, HIGH);
+				myNumSteps++;
+			}
 		myLastStepTime = loopMicros;
 		calculateNextStepParams();
-		if (myNewDirection != myDirection) {
-			myDirection = myNewDirection;
-			digitalWrite(myDirectionPin, myDirection);
-		}
-		digitalWrite(myStepPin, LOW);
-		delayMicroseconds(10);
-		digitalWrite(myStepPin, HIGH);
-
-		myNumSteps++;
 	}
 }
 
@@ -75,6 +75,7 @@ uint32_t map_uint32_t(uint32_t x, uint32_t in_min, uint32_t in_max,
 void Stapper::calculateNextStepParams() {
 	myActualRoundsPerMinute = myRoundsPerMinute;
 	if (mySpeedType == CONSTANT) {
+		myNewDirection = 1;
 		if (loopMillis - myLastSetSpeed < myAccelerationDuration) {
 			uint32_t time = loopMillis - myLastSetSpeed;
 			if (myOldRoundsPerMinute == 0) {
@@ -85,9 +86,9 @@ void Stapper::calculateNextStepParams() {
 		}
 	} else {
 		uint32_t time = loopMillis - myLastSetSpeed;
-		float angle = (((float) time) * 3.14) / mySinusDuration;
+		float angle = (((float) time) * 6.28) / ((float)mySinusDuration);
 		float sinus = sin(angle);
-		myActualRoundsPerMinute = abs(sinus) * myRoundsPerMinute;
+		myActualRoundsPerMinute = abs(sinus) * myMaxRoundsPerMinute;
 		sinus < 0 ? myNewDirection = LOW : myNewDirection = HIGH;
 	}
 //		Serial.print(time);
@@ -100,10 +101,14 @@ void Stapper::calculateNextStepParams() {
 //		Serial.print(";");
 //		Serial.println(myActualRoundsPerMinute);
 	//usedRoundsPerMinute=usedRoundsPerMinute*(loopMillis-myLastSetSpeed/myAccelerationDuration);
-	uint32_t stepsPerMinute = myActualRoundsPerMinute
-			* (uint32_t) myStepsPerRound;
-	myNextStepDuration = 60000000UL / stepsPerMinute;
-	myDirection = 1;
+	if (((int) (myActualRoundsPerMinute*100UL))== 0) {
+		myNextStepDuration = 1000;
+		myActualRoundsPerMinute=0;
+	} else {
+		uint32_t stepsPerMinute = myActualRoundsPerMinute
+				* (uint32_t) myStepsPerRound;
+		myNextStepDuration = 60000000UL / stepsPerMinute;
+	}
 
 //			Serial.print(stepsPerMinute);
 //			Serial.print(";");
