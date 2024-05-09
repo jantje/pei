@@ -77,15 +77,15 @@ void Brains::loop() {
 }
 
 void Brains::changeToState1() {
-	myStapper.setSpeed(10, 20000);
+	myStapper.setSpeed(10, 0);
 }
 void Brains::changeToState2() {
-	myStapper.setSpeed(20, 20000);
+	myStapper.setSpeed(20, 0);
 }
 void Brains::changeToState3() {
-	myStapper.setSinusSpeed(45, 20000,10 MINUTES);
+	myStapper.setSinusSpeed(45, 0,10 MINUTES);
 }
 void Brains::changeToState4() {
-	myStapper.setSinusSpeed(45, 20000,20 MINUTES);
+	myStapper.setSinusSpeed(45, 0,20 MINUTES);
 }
 
