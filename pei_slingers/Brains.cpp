@@ -9,12 +9,12 @@
 
 
 Brains::Brains() {
-	// TODO Auto-generated constructor stub
+	// Nothing to do here
 
 }
 
 Brains::~Brains() {
-	// TODO Auto-generated destructor stub
+	// Nothing to do here
 }
 
 void Brains::setup() {
